@@ -10,9 +10,8 @@ public sealed class OrdersDbContext(DbContextOptions<OrdersDbContext> options) :
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var order = modelBuilder.Entity<Order>();
-        order.HasKey(x => x.Id);
-        order.HasIndex(x => x.OrderNumber).IsUnique();
-        order.Property(x => x.OrderNumber).HasMaxLength(32).IsRequired();
+        order.HasKey(x => x.OrderNumber);
+        order.Property(x => x.OrderNumber).ValueGeneratedOnAdd();
         order.Property(x => x.SenderCity).HasMaxLength(100).IsRequired();
         order.Property(x => x.SenderAddress).HasMaxLength(250).IsRequired();
         order.Property(x => x.RecipientCity).HasMaxLength(100).IsRequired();

@@ -85,8 +85,8 @@ export function OrdersListPage() {
           <div>
             {orders.map((order) => (
               <Link
-                key={order.id}
-                to={`/orders/${order.id}`}
+                key={order.orderNumber}
+                to={`/orders/${order.orderNumber}`}
                 className="group block border-b border-slate-100 px-5 py-4 last:border-0 hover:bg-teal-50/40"
               >
                 <div className="grid gap-2 md:grid-cols-[1.2fr_1fr_1fr_0.6fr_0.8fr] md:items-center md:gap-4">

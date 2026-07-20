@@ -1,6 +1,5 @@
 export type Order = {
-  id: string;
-  orderNumber: string;
+  orderNumber: number;
   senderCity: string;
   senderAddress: string;
   recipientCity: string;
@@ -12,6 +11,6 @@ export type Order = {
 
 export type CreateOrderPayload = Omit<
   Order,
-  "id" | "orderNumber" | "createdAt"
+  "orderNumber" | "createdAt"
 >;
 export type FieldErrors = Partial<Record<keyof CreateOrderPayload, string>>;

@@ -15,7 +15,7 @@ public static class OrdersEndpoints
             if (errors.Count > 0) return Results.ValidationProblem(errors);
 
             var order = await ordersService.CreateAsync(request, cancellationToken);
-            return Results.Created($"/api/orders/{order.Id}", order);
+            return Results.Created($"/api/orders/{order.OrderNumber}", order);
         }).WithName("CreateOrder");
 
         group.MapGet("", async (IOrdersService ordersService, CancellationToken cancellationToken) =>
@@ -24,9 +24,9 @@ public static class OrdersEndpoints
             return Results.Ok(orders);
         }).WithName("GetOrders");
 
-        group.MapGet("/{id:guid}", async (Guid id, IOrdersService ordersService, CancellationToken cancellationToken) =>
+        group.MapGet("/{orderNumber:long}", async (long orderNumber, IOrdersService ordersService, CancellationToken cancellationToken) =>
         {
-            var order = await ordersService.GetByIdAsync(id, cancellationToken);
+            var order = await ordersService.GetByOrderNumberAsync(orderNumber, cancellationToken);
             return order is null ? Results.NotFound() : Results.Ok(order);
         }).WithName("GetOrder");
 

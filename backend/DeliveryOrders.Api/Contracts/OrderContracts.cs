@@ -9,8 +9,7 @@ public sealed record CreateOrderRequest(
     DateOnly PickupDate);
 
 public sealed record OrderResponse(
-    Guid Id,
-    string OrderNumber,
+    long OrderNumber,
     string SenderCity,
     string SenderAddress,
     string RecipientCity,

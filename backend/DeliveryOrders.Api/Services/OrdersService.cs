@@ -9,12 +9,9 @@ public sealed class OrdersService(OrdersDbContext db) : IOrdersService
 {
     public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken)
     {
-        var id = Guid.NewGuid();
         var now = DateTimeOffset.UtcNow;
         var order = new Order
         {
-            Id = id,
-            OrderNumber = OrderNumberGenerator.Create(now, id),
             SenderCity = request.SenderCity!.Trim(),
             SenderAddress = request.SenderAddress!.Trim(),
             RecipientCity = request.RecipientCity!.Trim(),
@@ -33,19 +30,19 @@ public sealed class OrdersService(OrdersDbContext db) : IOrdersService
         await db.Orders.AsNoTracking()
             .OrderByDescending(order => order.CreatedAt)
             .Select(order => new OrderResponse(
-                order.Id, order.OrderNumber, order.SenderCity, order.SenderAddress,
+                order.OrderNumber, order.SenderCity, order.SenderAddress,
                 order.RecipientCity, order.RecipientAddress, order.Weight, order.PickupDate, new DateTimeOffset(order.CreatedAt)))
             .ToListAsync(cancellationToken);
 
-    public async Task<OrderResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+    public async Task<OrderResponse?> GetByOrderNumberAsync(long orderNumber, CancellationToken cancellationToken) =>
         await db.Orders.AsNoTracking()
-            .Where(order => order.Id == id)
+            .Where(order => order.OrderNumber == orderNumber)
             .Select(order => new OrderResponse(
-                order.Id, order.OrderNumber, order.SenderCity, order.SenderAddress,
+                order.OrderNumber, order.SenderCity, order.SenderAddress,
                 order.RecipientCity, order.RecipientAddress, order.Weight, order.PickupDate, new DateTimeOffset(order.CreatedAt)))
             .SingleOrDefaultAsync(cancellationToken);
 
     private static OrderResponse ToResponse(Order order) => new(
-        order.Id, order.OrderNumber, order.SenderCity, order.SenderAddress,
+        order.OrderNumber, order.SenderCity, order.SenderAddress,
         order.RecipientCity, order.RecipientAddress, order.Weight, order.PickupDate, new DateTimeOffset(order.CreatedAt));
 }

@@ -39,7 +39,7 @@ export function NewOrderPage() {
     setSubmitError("");
     try {
       const order = await ordersApi.create(values);
-      navigate(`/orders/${order.id}`, { state: { created: true } });
+      navigate(`/orders/${order.orderNumber}`, { state: { created: true } });
     } catch (error) {
       if (error instanceof ApiError) {
         setErrors(error.fields);

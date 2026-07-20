@@ -40,7 +40,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const ordersApi = {
   list: () => request<Order[]>("/orders"),
-  get: (id: string) => request<Order>(`/orders/${id}`),
+  get: (orderNumber: string) => request<Order>(`/orders/${orderNumber}`),
   create: (payload: CreateOrderPayload) =>
     request<Order>("/orders", {
       method: "POST",

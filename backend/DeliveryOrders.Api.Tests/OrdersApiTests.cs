@@ -23,9 +23,9 @@ public sealed class OrdersApiTests : IClassFixture<OrdersApiTests.TestApplicatio
         Assert.True(create.StatusCode == HttpStatusCode.Created, await create.Content.ReadAsStringAsync());
         var created = await create.Content.ReadFromJsonAsync<OrderResponse>();
         Assert.NotNull(created);
-        Assert.StartsWith("ORD-202", created.OrderNumber);
+        Assert.True(created.OrderNumber > 0);
 
-        var get = await _client.GetAsync($"/api/orders/{created.Id}");
+        var get = await _client.GetAsync($"/api/orders/{created.OrderNumber}");
         var order = await get.Content.ReadFromJsonAsync<OrderResponse>();
         Assert.Equal(HttpStatusCode.OK, get.StatusCode);
         Assert.Equal("Москва", order!.SenderCity);
@@ -44,6 +44,15 @@ public sealed class OrdersApiTests : IClassFixture<OrdersApiTests.TestApplicatio
     }
 
     [Fact]
+    public async Task Create_AssignsSequentialOrderNumbers()
+    {
+        var first = await CreateOrderAsync("Москва");
+        var second = await CreateOrderAsync("Казань");
+
+        Assert.Equal(first.OrderNumber + 1, second.OrderNumber);
+    }
+
+    [Fact]
     public async Task Create_ReturnsValidationProblem_ForInvalidPayload()
     {
         var response = await _client.PostAsJsonAsync("/api/orders", new CreateOrderRequest("", "", "", "", 0, default));
@@ -53,8 +62,17 @@ public sealed class OrdersApiTests : IClassFixture<OrdersApiTests.TestApplicatio
     [Fact]
     public async Task Get_ReturnsNotFound_ForUnknownOrder()
     {
-        var response = await _client.GetAsync($"/api/orders/{Guid.NewGuid()}");
+        var response = await _client.GetAsync("/api/orders/999999");
         Assert.True(response.StatusCode == HttpStatusCode.NotFound, await response.Content.ReadAsStringAsync());
+    }
+
+    private async Task<OrderResponse> CreateOrderAsync(string senderCity)
+    {
+        var response = await _client.PostAsJsonAsync(
+            "/api/orders",
+            new CreateOrderRequest(senderCity, "Ленина, 1", "Уфа", "Мира, 2", 1m, new DateOnly(2026, 8, 1)));
+        Assert.True(response.StatusCode == HttpStatusCode.Created, await response.Content.ReadAsStringAsync());
+        return (await response.Content.ReadFromJsonAsync<OrderResponse>())!;
     }
 
     public sealed class TestApplication : WebApplicationFactory<Program>

@@ -21,32 +21,32 @@ public sealed class OrdersServiceTests
 
         Assert.Equal("Москва", result.SenderCity);
         Assert.Equal("Баумана, 2", result.RecipientAddress);
-        Assert.StartsWith("ORD-", result.OrderNumber);
-        Assert.Equal(result.Id, await db.Orders.Select(order => order.Id).SingleAsync());
+        Assert.True(result.OrderNumber > 0);
+        Assert.Equal(result.OrderNumber, await db.Orders.Select(order => order.OrderNumber).SingleAsync());
     }
 
     [Fact]
     public async Task GetAllAsync_ReturnsNewestOrdersFirst()
     {
         await using var db = CreateDbContext();
-        var older = CreateOrder("ORD-OLDER", new DateTime(2026, 7, 1, 10, 0, 0, DateTimeKind.Utc));
-        var newer = CreateOrder("ORD-NEWER", new DateTime(2026, 7, 2, 10, 0, 0, DateTimeKind.Utc));
+        var older = CreateOrder("Москва", new DateTime(2026, 7, 1, 10, 0, 0, DateTimeKind.Utc));
+        var newer = CreateOrder("Казань", new DateTime(2026, 7, 2, 10, 0, 0, DateTimeKind.Utc));
         db.Orders.AddRange(older, newer);
         await db.SaveChangesAsync(CancellationToken.None);
 
         var result = await new OrdersService(db).GetAllAsync(CancellationToken.None);
 
         Assert.Collection(result,
-            order => Assert.Equal("ORD-NEWER", order.OrderNumber),
-            order => Assert.Equal("ORD-OLDER", order.OrderNumber));
+            order => Assert.Equal("Казань", order.SenderCity),
+            order => Assert.Equal("Москва", order.SenderCity));
     }
 
     [Fact]
-    public async Task GetByIdAsync_ReturnsNullWhenOrderDoesNotExist()
+    public async Task GetByOrderNumberAsync_ReturnsNullWhenOrderDoesNotExist()
     {
         await using var db = CreateDbContext();
 
-        var result = await new OrdersService(db).GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        var result = await new OrdersService(db).GetByOrderNumberAsync(999999, CancellationToken.None);
 
         Assert.Null(result);
     }
@@ -56,11 +56,9 @@ public sealed class OrdersServiceTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options);
 
-    private static Order CreateOrder(string orderNumber, DateTime createdAt) => new()
+    private static Order CreateOrder(string senderCity, DateTime createdAt) => new()
     {
-        Id = Guid.NewGuid(),
-        OrderNumber = orderNumber,
-        SenderCity = "Москва",
+        SenderCity = senderCity,
         SenderAddress = "Тверская, 1",
         RecipientCity = "Казань",
         RecipientAddress = "Баумана, 2",

@@ -70,7 +70,7 @@ export function OrderDetailsPage() {
     );
   return (
     <>
-      <PageTitle eyebrow="Заказ" title={order.orderNumber}>
+      <PageTitle eyebrow="Заказ" title={String(order.orderNumber)}>
         <Link
           to="/orders"
           className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-teal-700"

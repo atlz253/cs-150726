@@ -6,5 +6,5 @@ public interface IOrdersService
 {
     Task<OrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken);
     Task<IReadOnlyList<OrderResponse>> GetAllAsync(CancellationToken cancellationToken);
-    Task<OrderResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task<OrderResponse?> GetByOrderNumberAsync(long orderNumber, CancellationToken cancellationToken);
 }

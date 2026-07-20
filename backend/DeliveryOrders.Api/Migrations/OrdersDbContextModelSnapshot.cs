@@ -1,4 +1,3 @@
-using System;
 using DeliveryOrders.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -16,17 +15,15 @@ partial class OrdersDbContextModelSnapshot : ModelSnapshot
         modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
         modelBuilder.Entity("DeliveryOrders.Api.Domain.Order", b =>
         {
-            b.Property<Guid>("Id").HasColumnType("TEXT");
             b.Property<DateTime>("CreatedAt").HasColumnType("TEXT");
-            b.Property<string>("OrderNumber").IsRequired().HasMaxLength(32).HasColumnType("TEXT");
+            b.Property<long>("OrderNumber").ValueGeneratedOnAdd().HasColumnType("INTEGER");
             b.Property<DateOnly>("PickupDate").HasColumnType("TEXT");
             b.Property<string>("RecipientAddress").IsRequired().HasMaxLength(250).HasColumnType("TEXT");
             b.Property<string>("RecipientCity").IsRequired().HasMaxLength(100).HasColumnType("TEXT");
             b.Property<string>("SenderAddress").IsRequired().HasMaxLength(250).HasColumnType("TEXT");
             b.Property<string>("SenderCity").IsRequired().HasMaxLength(100).HasColumnType("TEXT");
             b.Property<decimal>("Weight").HasPrecision(10, 3).HasColumnType("TEXT");
-            b.HasKey("Id");
-            b.HasIndex("OrderNumber").IsUnique();
+            b.HasKey("OrderNumber");
             b.ToTable("Orders");
         });
     }
