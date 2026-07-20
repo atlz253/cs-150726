@@ -1,5 +1,6 @@
 using DeliveryOrders.Api.Data;
 using DeliveryOrders.Api.Endpoints;
+using DeliveryOrders.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<OrdersDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("OrdersDatabase")));
+builder.Services.AddScoped<IOrdersService, OrdersService>();
 builder.Services.AddCors(options => options.AddPolicy("frontend", policy =>
     policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
 
