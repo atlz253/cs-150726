@@ -100,7 +100,7 @@ export function OrdersListPage() {
       {orders && orders.length > 0 && ordersPage && (
         <>
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="hidden grid-cols-[1.2fr_1fr_1fr_0.6fr_0.8fr] gap-4 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 md:grid">
+            <div className="hidden grid-cols-[0.8fr_1.5fr_1.5fr_0.5fr_0.7fr] gap-4 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 md:grid">
               <span>Номер заказа</span>
               <span>Откуда</span>
               <span>Куда</span>
@@ -114,17 +114,29 @@ export function OrdersListPage() {
                   to={`/orders/${order.orderNumber}`}
                   className="group block border-b border-slate-100 px-5 py-4 last:border-0 hover:bg-teal-50/40"
                 >
-                  <div className="grid gap-2 md:grid-cols-[1.2fr_1fr_1fr_0.6fr_0.8fr] md:items-center md:gap-4">
+                  <div className="grid gap-2 md:grid-cols-[0.8fr_1.5fr_1.5fr_0.5fr_0.7fr] md:items-center md:gap-4">
                     <span className="font-semibold text-teal-700 group-hover:underline">
                       {order.orderNumber}
                     </span>
                     <span className="text-sm">
-                      <span className="md:hidden text-slate-500">Откуда: </span>
-                      {order.senderCity}
+                      <span className="block font-medium">
+                        <span className="md:hidden text-slate-500">Откуда: </span>
+                        {order.senderCity}
+                      </span>
+                      <span className="mt-0.5 block text-slate-600">
+                        <span className="md:hidden text-slate-500">Адрес: </span>
+                        {order.senderAddress}
+                      </span>
                     </span>
                     <span className="text-sm">
-                      <span className="md:hidden text-slate-500">Куда: </span>
-                      {order.recipientCity}
+                      <span className="block font-medium">
+                        <span className="md:hidden text-slate-500">Куда: </span>
+                        {order.recipientCity}
+                      </span>
+                      <span className="mt-0.5 block text-slate-600">
+                        <span className="md:hidden text-slate-500">Адрес: </span>
+                        {order.recipientAddress}
+                      </span>
                     </span>
                     <span className="text-sm">{order.weight} кг</span>
                     <span className="text-sm text-slate-600">

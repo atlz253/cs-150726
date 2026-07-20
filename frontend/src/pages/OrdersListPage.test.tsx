@@ -44,6 +44,8 @@ describe("OrdersListPage", () => {
     );
 
     await waitFor(() => expect(list).toHaveBeenCalledWith(2));
+    expect(screen.getByText("Тверская, 1")).toBeInTheDocument();
+    expect(screen.getByText("Баумана, 2")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /вперёд/i })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: /назад/i }));
