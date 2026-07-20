@@ -18,9 +18,12 @@ public static class OrdersEndpoints
             return Results.Created($"/api/orders/{order.OrderNumber}", order);
         }).WithName("CreateOrder");
 
-        group.MapGet("", async (IOrdersService ordersService, CancellationToken cancellationToken) =>
+        group.MapGet("", async (IOrdersService ordersService, CancellationToken cancellationToken, int page = 1) =>
         {
-            var orders = await ordersService.GetAllAsync(cancellationToken);
+            if (page < 1)
+                return Results.ValidationProblem(new Dictionary<string, string[]> { ["page"] = ["Номер страницы должен быть не меньше 1."] });
+
+            var orders = await ordersService.GetPageAsync(page, cancellationToken);
             return Results.Ok(orders);
         }).WithName("GetOrders");
 

@@ -39,8 +39,10 @@ public sealed class OrdersApiTests : IClassFixture<OrdersApiTests.TestApplicatio
 
         var response = await _client.GetAsync("/api/orders");
         Assert.True(response.StatusCode == HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
-        var orders = await response.Content.ReadFromJsonAsync<List<OrderResponse>>();
-        Assert.NotEmpty(orders!);
+        var orders = await response.Content.ReadFromJsonAsync<PagedOrdersResponse>();
+        Assert.NotEmpty(orders!.Items);
+        Assert.Equal(1, orders.Page);
+        Assert.Equal(20, orders.PageSize);
     }
 
     [Fact]
@@ -50,6 +52,41 @@ public sealed class OrdersApiTests : IClassFixture<OrdersApiTests.TestApplicatio
         var second = await CreateOrderAsync("Казань");
 
         Assert.Equal(first.OrderNumber + 1, second.OrderNumber);
+    }
+
+    [Fact]
+    public async Task List_ReturnsDistinctPagesOfTwentyOrders()
+    {
+        for (var index = 0; index < 21; index++)
+            await CreateOrderAsync($"Город {index}");
+
+        var firstPage = await _client.GetFromJsonAsync<PagedOrdersResponse>("/api/orders?page=1");
+        var secondPage = await _client.GetFromJsonAsync<PagedOrdersResponse>("/api/orders?page=2");
+
+        Assert.NotNull(firstPage);
+        Assert.NotNull(secondPage);
+        Assert.Equal(20, firstPage.Items.Count);
+        Assert.True(secondPage.Items.Count > 0);
+        Assert.Empty(firstPage.Items.Select(order => order.OrderNumber).Intersect(secondPage.Items.Select(order => order.OrderNumber)));
+        Assert.True(firstPage.TotalCount >= 21);
+        Assert.True(firstPage.TotalPages >= 2);
+    }
+
+    [Fact]
+    public async Task List_ReturnsValidationProblemForPageBelowOne()
+    {
+        var response = await _client.GetAsync("/api/orders?page=0");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task List_ReturnsEmptyItemsForPageBeyondAvailableData()
+    {
+        var response = await _client.GetFromJsonAsync<PagedOrdersResponse>("/api/orders?page=999999");
+
+        Assert.NotNull(response);
+        Assert.Empty(response.Items);
     }
 
     [Fact]

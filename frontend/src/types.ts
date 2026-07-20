@@ -9,6 +9,14 @@ export type Order = {
   createdAt: string;
 };
 
+export type PagedOrders = {
+  items: Order[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+};
+
 export type CreateOrderPayload = Omit<
   Order,
   "orderNumber" | "createdAt"

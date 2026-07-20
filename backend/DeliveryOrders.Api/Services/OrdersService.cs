@@ -7,6 +7,8 @@ namespace DeliveryOrders.Api.Services;
 
 public sealed class OrdersService(OrdersDbContext db) : IOrdersService
 {
+    private const int PageSize = 20;
+
     public async Task<OrderResponse> CreateAsync(CreateOrderRequest request, CancellationToken cancellationToken)
     {
         var now = DateTimeOffset.UtcNow;
@@ -26,13 +28,25 @@ public sealed class OrdersService(OrdersDbContext db) : IOrdersService
         return ToResponse(order);
     }
 
-    public async Task<IReadOnlyList<OrderResponse>> GetAllAsync(CancellationToken cancellationToken) =>
-        await db.Orders.AsNoTracking()
+    public async Task<PagedOrdersResponse> GetPageAsync(int page, CancellationToken cancellationToken)
+    {
+        var totalCount = await db.Orders.CountAsync(cancellationToken);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
+        if (page > totalPages && totalPages > 0)
+            return new PagedOrdersResponse([], page, PageSize, totalCount, totalPages);
+
+        var items = await db.Orders.AsNoTracking()
             .OrderByDescending(order => order.CreatedAt)
+            .ThenByDescending(order => order.OrderNumber)
+            .Skip((page - 1) * PageSize)
+            .Take(PageSize)
             .Select(order => new OrderResponse(
                 order.OrderNumber, order.SenderCity, order.SenderAddress,
                 order.RecipientCity, order.RecipientAddress, order.Weight, order.PickupDate, new DateTimeOffset(order.CreatedAt)))
             .ToListAsync(cancellationToken);
+
+        return new PagedOrdersResponse(items, page, PageSize, totalCount, totalPages);
+    }
 
     public async Task<OrderResponse?> GetByOrderNumberAsync(long orderNumber, CancellationToken cancellationToken) =>
         await db.Orders.AsNoTracking()

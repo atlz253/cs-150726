@@ -26,7 +26,7 @@ public sealed class OrdersServiceTests
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsNewestOrdersFirst()
+    public async Task GetPageAsync_ReturnsNewestOrdersFirst()
     {
         await using var db = CreateDbContext();
         var older = CreateOrder("Москва", new DateTime(2026, 7, 1, 10, 0, 0, DateTimeKind.Utc));
@@ -34,9 +34,9 @@ public sealed class OrdersServiceTests
         db.Orders.AddRange(older, newer);
         await db.SaveChangesAsync(CancellationToken.None);
 
-        var result = await new OrdersService(db).GetAllAsync(CancellationToken.None);
+        var result = await new OrdersService(db).GetPageAsync(1, CancellationToken.None);
 
-        Assert.Collection(result,
+        Assert.Collection(result.Items,
             order => Assert.Equal("Казань", order.SenderCity),
             order => Assert.Equal("Москва", order.SenderCity));
     }

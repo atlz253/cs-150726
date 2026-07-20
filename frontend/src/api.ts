@@ -1,4 +1,4 @@
-import type { CreateOrderPayload, FieldErrors, Order } from "./types";
+import type { CreateOrderPayload, FieldErrors, Order, PagedOrders } from "./types";
 
 const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:5050/api";
 
@@ -39,7 +39,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const ordersApi = {
-  list: () => request<Order[]>("/orders"),
+  list: (page: number) => request<PagedOrders>(`/orders?page=${page}`),
   get: (orderNumber: string) => request<Order>(`/orders/${orderNumber}`),
   create: (payload: CreateOrderPayload) =>
     request<Order>("/orders", {

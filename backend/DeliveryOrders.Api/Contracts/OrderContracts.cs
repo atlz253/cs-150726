@@ -17,3 +17,10 @@ public sealed record OrderResponse(
     decimal Weight,
     DateOnly PickupDate,
     DateTimeOffset CreatedAt);
+
+public sealed record PagedOrdersResponse(
+    IReadOnlyList<OrderResponse> Items,
+    int Page,
+    int PageSize,
+    int TotalCount,
+    int TotalPages);
